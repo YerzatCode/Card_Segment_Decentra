@@ -1,0 +1,41 @@
+# Виртуальное окружение
+venv/
+
+# Файлы Jupyter Notebook checkpoint'ов
+.ipynb_checkpoints/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Конфигурации IDE
+.vscode/
+.idea/
+
+# Файлы данных
+data/raw/*
+!data/raw/.gitkeep      # Оставляем папку пустой в git
+data/processed/*
+!data/processed/.gitkeep
+
+# Модели
+models/*
+!models/.gitkeep
+
+# Графики, временные визуализации
+reports/figures/*
+!reports/figures/.gitkeep
+
+# Логи, временные файлы
+*.log
+*.tmp
+*.bak
+
+# Пароли и ключи (если вдруг есть)
+.env
+*.env
+
+# Файлы системы
+.DS_Store
+Thumbs.db
