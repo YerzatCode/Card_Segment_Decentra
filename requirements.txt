@@ -1,8 +1,9 @@
 pandas
-numpy
 scikit-learn
+pyarrow
 matplotlib
 seaborn
-pyarrow
 jupyter
-notebook
+streamlit
+faker
+openpyxl
