@@ -267,3 +267,15 @@ print(f"Данные по агрегированным признакам сох
 # Также, если вам необходимо сохранить обработанный DataFrame транзакций, выполненный на этапе 1:
 df_transactions.to_csv(output_path_transactions, index=False)
 print(f"Обработанные транзакционные данные сохранены в: {output_path_transactions}")
+
+# Пути для сохранения CSV файлов (при необходимости измените пути на актуальные для вашего проекта)
+output_path_features = 'data/processed/client_features.parquet'
+output_path_transactions = 'data/processed/transactions_processed.parquet'
+
+# Сохранение агрегированных признаков (на клиентском уровне)
+df_features.to_parquet(output_path_features, index=True)
+print(f"Данные по агрегированным признакам сохранены в: {output_path_features}")
+
+# Также, если вам необходимо сохранить обработанный DataFrame транзакций, выполненный на этапе 1:
+df_transactions.to_parquet(output_path_transactions, index=False)
+print(f"Обработанные транзакционные данные сохранены в: {output_path_transactions}")
