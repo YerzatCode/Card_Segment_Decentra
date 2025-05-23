@@ -1,81 +1,72 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-# Загрузи данные
+# Загрузка данных
 df = pd.read_csv("data/csv/transactions_processed.csv")
 
-# Укажи нужный card_id
-target_card_id = 10001
-
-# Преобразуем дату и выделим месяц
+# Преобразуем дату и добавим месяц
 df["transaction_timestamp"] = pd.to_datetime(df["transaction_timestamp"])
 df["month"] = df["transaction_timestamp"].dt.to_period("M")
 
-# Отфильтруй по этому клиенту
-filtered = df[df["card_id"] == target_card_id]
+# Создаём папки для сохранения
+os.makedirs("output/graphs", exist_ok=True)
+os.makedirs("output/csv", exist_ok=True)
 
-# === ГРАФИК 1: Суммы по категориям MCC ===
-grouped_mcc = (
-    filtered.groupby("mcc_category")["transaction_amount_kzt"]
-    .sum()
-    .sort_values(ascending=False)
-)
+# Получаем всех клиентов
+card_ids = df["card_id"].unique()
 
-# === ГРАФИК 2: Распределение по типу транзакций ===
-grouped_type = (
-    filtered.groupby("transaction_type")["transaction_amount_kzt"]
-    .sum()
-    .sort_values(ascending=False)
-)
+# Цикл по каждому клиенту
+for card_id in card_ids:
+    filtered = df[df["card_id"] == card_id]
 
-# === ГРАФИК 3: Суммы по MCC категориям по месяцам ===
-mcc_monthly = (
-    filtered.groupby(["month", "mcc_category"])["transaction_amount_kzt"]
-    .sum()
-    .unstack(fill_value=0)
-)
+    # Пропускаем если мало данных
+    if len(filtered) < 5:
+        continue
 
-# === ГРАФИК 4: Суммы по типам транзакций по месяцам ===
-type_monthly = (
-    filtered.groupby(["month", "transaction_type"])["transaction_amount_kzt"]
-    .sum()
-    .unstack(fill_value=0)
-)
+    # === Группировки ===
+    grouped_mcc = filtered.groupby("mcc_category")["transaction_amount_kzt"].sum().sort_values(ascending=False)
+    grouped_type = filtered.groupby("transaction_type")["transaction_amount_kzt"].sum().sort_values(ascending=False)
+    mcc_monthly = filtered.groupby(["month", "mcc_category"])["transaction_amount_kzt"].sum().unstack(fill_value=0)
+    type_monthly = filtered.groupby(["month", "transaction_type"])["transaction_amount_kzt"].sum().unstack(fill_value=0)
 
-# === ВИЗУАЛИЗАЦИЯ ===
-plt.figure(figsize=(14, 10))
+    # === Визуализация ===
+    plt.figure(figsize=(14, 10))
+    plt.suptitle(f"Анализ по клиенту card_id = {card_id}", fontsize=16)
 
-# 1. Суммы по MCC
-plt.subplot(2, 2, 1)
-grouped_mcc.plot(kind="bar", ax=plt.gca())
-plt.title(f"Суммы покупок по категориям (card_id = {target_card_id})")
-plt.ylabel("Сумма, ₸")
-plt.xlabel("Категория (MCC)")
-plt.xticks(rotation=45, ha="right")
+    plt.subplot(2, 2, 1)
+    grouped_mcc.plot(kind="bar", ax=plt.gca())
+    plt.title("Суммы по MCC")
+    plt.ylabel("₸")
+    plt.xticks(rotation=45, ha="right")
 
-# 2. Типы транзакций
-plt.subplot(2, 2, 2)
-grouped_type.plot(kind="bar", color="orange", ax=plt.gca())
-plt.title("Распределение по типу операций")
-plt.ylabel("Сумма, ₸")
-plt.xlabel("Тип транзакции")
-plt.xticks(rotation=45, ha="right")
+    plt.subplot(2, 2, 2)
+    grouped_type.plot(kind="bar", color="orange", ax=plt.gca())
+    plt.title("Суммы по типам транзакций")
+    plt.ylabel("₸")
+    plt.xticks(rotation=45, ha="right")
 
-# 3. Динамика MCC по месяцам
-plt.subplot(2, 2, 3)
-mcc_monthly.plot(ax=plt.gca(), marker="o")
-plt.title("Динамика по MCC категориям")
-plt.ylabel("Сумма, ₸")
-plt.xlabel("Месяц")
-plt.xticks(rotation=45)
+    plt.subplot(2, 2, 3)
+    mcc_monthly.plot(ax=plt.gca(), marker="o")
+    plt.title("MCC по месяцам")
+    plt.ylabel("₸")
+    plt.xticks(rotation=45)
 
-# 4. Динамика типов по месяцам
-plt.subplot(2, 2, 4)
-type_monthly.plot(ax=plt.gca(), marker="o")
-plt.title("Динамика по типам транзакций")
-plt.ylabel("Сумма, ₸")
-plt.xlabel("Месяц")
-plt.xticks(rotation=45)
+    plt.subplot(2, 2, 4)
+    type_monthly.plot(ax=plt.gca(), marker="o")
+    plt.title("Типы транзакций по месяцам")
+    plt.ylabel("₸")
+    plt.xticks(rotation=45)
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+
+    # Сохраняем как PNG
+    graph_path = f"output/graphs/card_{card_id}.png"
+    plt.savefig(graph_path)
+    plt.close()
+
+    # Сохраняем как CSV
+    csv_path = f"output/csv/card_{card_id}.csv"
+    filtered.to_csv(csv_path, index=False)
+
+    print(f"✅ Сохранено для card_id = {card_id}: PNG и CSV")
