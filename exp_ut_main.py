@@ -78,3 +78,6 @@ print(result)
 # 10. Сохранение результата в .parquet
 agg_df.to_parquet("data/processed/client_segments.parquet", index=False)
 print("Сегменты клиентов успешно сохранены в 'data/processed/client_segments.parquet'")
+
+agg_df.to_csv("data/processed/client_segments.csv", index=False)
+print("Сегменты клиентов успешно сохранены в 'data/processed/client_segments.csv'")

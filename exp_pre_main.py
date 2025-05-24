@@ -38,7 +38,7 @@ df_transactions.info()
 # expiry_date: Срок действия карты в формате MM/YY - object/string, можно преобразовать в datetime
 # issuer_bank_name: Название банка-эмитента карты - object/string
 # merchant_id: Идентификатор торговой точки - object/string (может быть пустым)
-# merchant_mcc: Код MCC (Merchant Category Code) - int or object (лучше category)
+# merchant_mcc: Код MCC (Merchant Category Code) - int or object (лучше str)
 # merchant_city: Город торговой точки - object/string (может быть пустым)
 # transaction_type: Тип операции - object/string (лучше category)
 # transaction_amount_kzt: Сумма транзакции в тенге (KZT) - float/int
@@ -168,6 +168,9 @@ df_features = df_transactions.groupby('card_id').agg(agg_functions)
 # Колонки после множественной агрегации имеют многоуровневые названия, упрощаем их:
 df_features.columns = ['_'.join(col).strip() for col in df_features.columns.values]
 
+# Сброс индекса: в результате 'card_id' станет обычным столбцом
+df_features = df_features.reset_index()
+
 # Добавляем новые признаки:
 # 1. Количество активных дней (от разницы между первой и последней транзакцией)
 df_features['active_days'] = (df_features['transaction_timestamp_max'] - df_features['transaction_timestamp_min']).dt.days + 1
@@ -262,6 +265,9 @@ plt.xlabel('log(Количество транзакций + 1)')
 plt.ylabel('log(Общая сумма транзакций (KZT) + 1)')
 plt.grid(True)
 plt.show()
+
+print(df_features.columns)
+print(df_transactions.columns)
 
 # Пути для сохранения CSV файлов (при необходимости измените пути на актуальные для вашего проекта)
 output_path_features = 'data/processed/client_features.csv'

@@ -10,8 +10,10 @@ import dask.dataframe as dd
 
 # 1. Загрузка данных из разных источников
 # Здесь можно подгрузить данные о клиентах, транзакциях, а также внешние данные (соцсети, обращения в колл-центр и т.д.)
-df_client = dd.read_parquet('data/processed/client_features.parquet')
-df_trans = dd.read_parquet('data/processed/transactions_processed.parquet')
+df1 = dd.read_parquet('data/processed/client_features.parquet')
+df2 = dd.read_parquet('data/processed/transactions_processed.parquet')
+df3 = dd.read_parquet('data/processed/client_segments.parquet')
+df4 = dd.read_parquet('data/processed/clients_behavior_metrics.parquet')
 # Если имеются и другие источники, например: df_external = pd.read_csv('data/processed/external_data.csv')
 
 
@@ -19,7 +21,15 @@ df_trans = dd.read_parquet('data/processed/transactions_processed.parquet')
 
 
 # Для простоты будем использовать объединение данных по card_id
-df = dd.merge(df_client, df_trans, on='card_id', how='left').compute()
+df1["card_id"] = df1["card_id"].fillna(0).astype("int64")
+df2["card_id"] = df2["card_id"].fillna(0).astype("int64")
+df3["card_id"] = df3["card_id"].fillna(0).astype("int64")
+df4["card_id"] = df4["card_id"].fillna(0).astype("int64")
+
+df0 = dd.merge(df1, df2, on="card_id", how="left")
+df_temp = dd.merge(df0, df3, on="card_id", how="left")
+df = dd.merge(df_temp, df4, on="card_id", how="left").compute()
+
 
 # 2. Приведение дат к корректному формату
 df['transaction_timestamp'] = pd.to_datetime(df['transaction_timestamp'], errors='coerce')
@@ -162,3 +172,6 @@ plt.show()
 # Сохранение результатов
 agg_df.to_parquet("data/processed/clients_future_action_recommendations.parquet", index=False)
 print("Результаты сохранены в 'data/processed/clients_future_action_recommendations.parquet'")
+
+agg_df.to_csv("data/processed/clients_future_action_recommendations.csv", index=False)
+print("Результаты сохранены в 'data/processed/clients_future_action_recommendations.csv'")

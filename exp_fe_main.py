@@ -124,3 +124,6 @@ print(result.head(20))
 # Опциональное сохранение результата
 agg_df.to_parquet("data/processed/clients_behavior_metrics.parquet", index=False)
 print("Поведенческие метрики клиентов сохранены в 'data/processed/clients_behavior_metrics.parquet'")
+
+agg_df.to_csv("data/processed/clients_behavior_metrics.csv", index=False)
+print("Поведенческие метрики клиентов сохранены в 'data/processed/clients_behavior_metrics.csv'")
