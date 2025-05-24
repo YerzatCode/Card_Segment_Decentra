@@ -1,3 +1,7 @@
+
+
+#тестовый не дэплой не трогай
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -23,6 +27,9 @@ mcc_dict = dict(zip(
     mcc_df['mcc_category']
 ))
 
+#тестовый не дэплой не трогай
+
+
 # 5. Маппинг и заполнение пропусков
 df['mcc_name'] = df['merchant_mcc'].map(mcc_dict).fillna('Неизвестная категория')
 
@@ -33,6 +40,9 @@ card_id = 10000 # <-- замените на тот, который нужен
 df_card = df[df['card_id'] == card_id]
 if df_card.empty:
     raise ValueError(f"Нет транзакций для card_id={card_id}")
+
+
+#тестовый не дэплой не трогай
 
 # 8. Группировка трат по категориям
 #     Убедитесь, что имя колонки с суммами верно:
@@ -51,6 +61,10 @@ spending_by_cat = (
 print(f"\nТраты для карты {card_id} по категориям MCC:")
 print(spending_by_cat.to_frame(name='Сумма трат').reset_index())
 
+
+#тестовый не дэплой не трогай
+
+
 # 10. Построение bar-chart
 plt.figure(figsize=(10, 6))
 spending_by_cat.plot(kind='bar')
@@ -61,3 +75,6 @@ plt.xticks(rotation=45, ha='right')
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
+
+
+#тестовый не дэплой не трогай
